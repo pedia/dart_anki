@@ -6,6 +6,7 @@ import 'package:dart_anki/src/models/anki_archive.dart';
 import 'package:dart_anki/src/models/card.dart';
 import 'package:dart_anki/src/models/resource.dart';
 import 'package:sqlite3/sqlite3.dart';
+import 'package:path/path.dart' as p;
 
 AnkiArchive parse_anki_archive(String ankiArchivePath) {
   final tempDir = Directory.systemTemp.createTempSync();
@@ -18,28 +19,27 @@ AnkiArchive parse_anki_archive(String ankiArchivePath) {
 
     if (file.isFile || filename == 'media') {
       final data = file.content as List<int>;
-      File(tempDir.path + '/' + filename)
+      File(p.join(tempDir.path, filename))
         ..createSync(recursive: true)
         ..writeAsBytesSync(data);
     } else {
-      Directory(tempDir.path + '/' + filename).create(recursive: true);
+      Directory(p.join(tempDir.path, filename)).create(recursive: true);
     }
   }
 
-  final mediaFile = File(tempDir.path + '/media');
+  final mediaFile = File(p.join(tempDir.path, 'media'));
   final resources = <Resource>[];
 
   if (mediaFile.existsSync()) {
     final jsonString = mediaFile.readAsStringSync();
-    final Map<String, String> mappedResources =
-        Map.castFrom(jsonDecode(jsonString));
+    final mappedResources = Map.castFrom(jsonDecode(jsonString));
 
     mappedResources.forEach((key, value) {
       resources.add(Resource(fileName: int.parse(key), resourceName: value));
     });
   }
 
-  final db = sqlite3.open(tempDir.path + '/collection.anki2');
+  final db = sqlite3.open(p.join(tempDir.path, 'collection.anki2'));
   final cards = <Card>[];
 
   final resultSet = db.select('SELECT * FROM cards');

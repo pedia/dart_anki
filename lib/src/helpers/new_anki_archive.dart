@@ -4,21 +4,22 @@ import 'package:dart_anki/src/models/anki_archive.dart';
 import 'package:dart_anki/src/models/card.dart';
 import 'package:dart_anki/src/models/resource.dart';
 import 'package:sqlite3/sqlite3.dart';
+import 'package:path/path.dart' as p;
 
 AnkiArchive new_anki_archive() {
   final tempDir = Directory.systemTemp.createTempSync();
   final resources = <Resource>[];
   final cards = <Card>[];
 
-  File(tempDir.path + '/media').create();
+  File(p.join(tempDir.path, 'media')).create();
 
-  final db = sqlite3.open(tempDir.path + '/collection.anki2');
+  final db = sqlite3.open(p.join(tempDir.path, 'collection.anki2'));
 
   // Initiallize the database
   db.execute('''
   CREATE TABLE cards (
     id              integer primary key,
-    nid             integer not null,--    
+    nid             integer not null,
     did             integer not null,
     ord             integer not null,
     mod             integer not null,
@@ -34,7 +35,7 @@ AnkiArchive new_anki_archive() {
     odue            integer not null,
     odid            integer not null,
     flags           integer not null,
-    data            text not nul
+    data            text not null
 );
 
 CREATE TABLE col (
