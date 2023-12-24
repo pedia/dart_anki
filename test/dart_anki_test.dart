@@ -11,13 +11,7 @@ void main() {
 
     test('Test files extracted', () {
       expect(instance.files.length, equals(48));
-    });
-
-    test('Test media files exist', () {
       expect(instance.resources.length, equals(46));
-    });
-
-    test('Test cards read', () {
       expect(instance.cards.length, equals(46));
       expect(instance.cards.first.id, equals(1296169988801));
     });
